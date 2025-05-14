@@ -1,6 +1,6 @@
 # exercise 1
 # up1092678
-# ECE Department - Univeristy of Patras
+# ECE Department - University of Patras
 # Data Mining and Learning Algorithms - Spring Semester 2024-2025
 
 import pandas as pd
