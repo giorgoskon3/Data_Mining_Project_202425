@@ -6,6 +6,6 @@
 pip install -r requirements.txt
 ```
 ## About Me:
-ΚΩΝΣΤΑΝΤΟΥΡΑΣ ΓΕΩΡΓΙΟΣ  
+Full Name: ΚΩΝΣΤΑΝΤΟΥΡΑΣ ΓΕΩΡΓΙΟΣ  
 Student ID: 1092678  
 Undergraduate Student at the Department of Electrical and Computer Engineering, University Of Patras
