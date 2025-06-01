@@ -1,4 +1,4 @@
-# Data-Mining
+# Data Mining and Machine Learning
 # Univeristy of Patras - Spring Semester 2024-2025  
 
 ## How to run
