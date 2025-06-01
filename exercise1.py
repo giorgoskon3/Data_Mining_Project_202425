@@ -163,20 +163,19 @@ if __name__ == "__main__":
     df = load_data(data)
     
     # Show info
-    # show_info(df)
+    show_info(df)
     
     # Show description
-    # desc = show_desc(df)
+    desc = show_desc(df)
     
     # Save description to CSV
-    # desc.to_csv("data_desc.csv", index=True)
+    desc.to_csv("data_desc.csv", index=True)
     
     # Show head of the data (first 5 rows)
-    # show_head(df)
-    
+    show_head(df)
     
     # Show histograms for all columns
-    # show_histogram(df)
+    show_histogram(df)
     
     # Show heatmap
     show_heatmap(df)
