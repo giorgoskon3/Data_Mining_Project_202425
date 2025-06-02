@@ -47,6 +47,8 @@ def preprocessing(df: dd.DataFrame) -> None:
             if abs(corr.iloc[i, j]) > 0.9:
                 to_drop.add(corr.columns[j])
     df = df.drop(columns=list(to_drop), errors="ignore")
+    cols_to_remove = ["Label", "Traffic Type", "Traffic Subtype"]
+    df = df.drop(columns=cols_to_remove, errors="ignore")
 
 def create_sample(df: dd.DataFrame, frac=0.1, label_col=None):
     separator("Creating Sample")
