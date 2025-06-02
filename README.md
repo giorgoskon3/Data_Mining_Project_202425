@@ -1,5 +1,5 @@
 # Data Mining and Machine Learning Implementation Project
-# Univeristy of Patras - Spring Semester 2024-2025  
+# University of Patras - Spring Semester 2024-2025  
 
 This project implements a full pipeline for data analysis, preprocessing, dimensionality reduction, and data compression using sampling and clustering techniques. It is based on the dataset provided for the TII SSRC 2023 Challenge.
 
