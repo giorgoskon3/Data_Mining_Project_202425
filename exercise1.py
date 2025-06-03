@@ -89,25 +89,70 @@ def show_histogram(df: dd.DataFrame, output_dir="histograms"):
         print(f"Αποθηκεύτηκε: {filename}")
 
     
-def show_heatmap(df: dd.DataFrame):
-    # Υπολογισμός μικρού δείγματος (1%)
-    df_sample = df.sample(frac=0.01).compute()
+# def show_heatmap(df: dd.DataFrame):
+#     # Υπολογισμός μικρού δείγματος (1%)
+#     df_sample = df.sample(frac=0.01).compute()
 
-    # Μετατροπή τύπων (π.χ. string[pyarrow] -> object)
+#     # Μετατροπή τύπων (π.χ. string[pyarrow] -> object)
+#     df_sample = df_sample.convert_dtypes()
+
+#     # Κράτα μόνο αριθμητικές στήλες
+#     df_numeric = df_sample.select_dtypes(include=["number"]).dropna()
+
+#     if df_numeric.shape[1] < 2:
+#         print("✘ Δεν υπάρχουν αρκετές αριθμητικές στήλες για heatmap.")
+#     else:
+#         corr = df_numeric.corr()
+    
+#     plt.figure(figsize=(10, 8))
+#     sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", square=True, cbar_kws={"shrink": .8})
+#     plt.title("Heatmap of Correlation Matrix")
+#     plt.tight_layout()
+#     plt.show()
+
+def show_heatmap(df: dd.DataFrame):
+
+    separator("Heatmap Correlation Matrix")
+
+    # Υπολογισμός δείγματος
+    df_sample = df.sample(frac=0.01).compute()
     df_sample = df_sample.convert_dtypes()
 
-    # Κράτα μόνο αριθμητικές στήλες
+    # Κρατάμε μόνο αριθμητικά
     df_numeric = df_sample.select_dtypes(include=["number"]).dropna()
 
+    # Αν δεν έχει 2+ στήλες, δεν φτιάχνουμε heatmap
     if df_numeric.shape[1] < 2:
         print("✘ Δεν υπάρχουν αρκετές αριθμητικές στήλες για heatmap.")
-    else:
-        corr = df_numeric.corr()
-    
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", square=True, cbar_kws={"shrink": .8})
-    plt.title("Heatmap of Correlation Matrix")
+        return
+
+    # Υπολογισμός πίνακα συσχέτισης
+    corr = df_numeric.corr()
+
+    # Φιλτράρουμε τις συσχετίσεις που έχουν τιμή > 0.9 για έξτρα αναφορά (προαιρετικό)
+    print("\nΙσχυρές συσχετίσεις (|corr| > 0.9):")
+    for i in range(len(corr.columns)):
+        for j in range(i+1, len(corr.columns)):
+            value = corr.iloc[i, j]
+            if abs(value) > 0.9:
+                print(f"{corr.columns[i]} <-> {corr.columns[j]}: {value:.2f}")
+
+    # Δημιουργία heatmap με καλύτερη μορφοποίηση
+    plt.figure(figsize=(18, 14))
+    sns.heatmap(
+        corr,
+        annot=False,
+        cmap="coolwarm",
+        fmt=".2f",
+        square=True,
+        linewidths=0.5,
+        cbar_kws={"shrink": .6}
+    )
+    plt.xticks(rotation=90, fontsize=8)
+    plt.yticks(fontsize=8)
+    plt.title("Correlation Heatmap of Numeric Features", fontsize=14, pad=20)
     plt.tight_layout()
+    plt.savefig("clean_heatmap.png", dpi=300)
     plt.show()
 
     
@@ -121,14 +166,13 @@ if __name__ == "__main__":
     show_info(df)
     
     # Show description
-    # desc = show_desc(df)
+    desc = show_desc(df)
     
     # Save description to CSV
-    # desc.to_csv("data_desc.csv", index=True)
+    desc.to_csv("data_desc.csv", index=True)
     
     # Show head of the data (first 5 rows)
-    # show_head(df)
-    
+    show_head(df)
     
     # Show histograms for all columns
     # show_histogram(df)

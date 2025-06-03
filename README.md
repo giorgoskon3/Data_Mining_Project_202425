@@ -19,3 +19,8 @@ Install all required dependencies by running:
 ```bash
 pip install -r requirements.txt
 ```
+
+## About Me:
+Full Name: ΚΩΝΣΤΑΝΤΟΥΡΑΣ ΓΕΩΡΓΙΟΣ  
+Student ID: 1092678  
+Undergraduate Student at the Department of Electrical and Computer Engineering, University Of Patras
