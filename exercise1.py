@@ -157,7 +157,7 @@ def show_heatmap(df: dd.DataFrame):
 
     
 if __name__ == "__main__":
-    data = "./data.csv"
+    data = "data.csv"
     
     # Load the data using Dask
     df = load_data(data)
