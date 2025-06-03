@@ -17,7 +17,6 @@ def separator(title: str = None):
 def load_data(file_path: str) -> pd.DataFrame:
     try:
         ddf = dd.read_csv(file_path, blocksize="16MB", dtype="object", assume_missing=True)
-        df_sample = ddf.head(n=1000)  # παίρνει τις πρώτες 1000 γραμμές
         df_sample = df_sample.convert_dtypes()
         separator("Data Loaded")
         return df_sample
