@@ -175,7 +175,7 @@ if __name__ == "__main__":
     show_head(df)
     
     # Show histograms for all columns
-    show_histogram(df)
+    # show_histogram(df)
     
     # Show heatmap
-    show_heatmap(df)
+    # show_heatmap(df)
