@@ -8,7 +8,11 @@ from sklearn.metrics import classification_report, accuracy_score, precision_sco
 
 def load_and_prepare_data(filename: str, target_col: str):
     df = pd.read_csv(filename)
-
+    
+    # Balanced sampling per category
+    if target_col == "Traffic Type":
+        df = df.groupby(target_col).apply(lambda g: g.sample(n=min(len(g), 300), random_state=42)).reset_index(drop=True)
+    
     # Remove NaN values in the target column
     df = df.dropna(subset=[target_col])
 
@@ -47,10 +51,8 @@ def evaluate_model(model, X_test, y_test, model_name="Model"):
     print("F1 Score:", f1_score(y_test, y_pred, average='weighted'))
     print("\nClassification Report:\n", classification_report(y_test, y_pred, zero_division=0))
 
-# ===== Example Usage =====
-# Change file_path and target_col accordingly
 if __name__ == "__main__":
-    file_path = "hdbscan_pca_sampled.csv"  # ή "agglo_sampled.csv", "hdbscan_pca.csv"
+    file_path = "hdbscan_pca_sampled.csv" # "sample.csv" for sampled data, "kmeans.csv" for k-means data
 
     for target in ["Label", "Traffic Type"]:
         print(f"\nEvaluating for Target: {target}")
