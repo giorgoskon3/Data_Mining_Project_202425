@@ -59,7 +59,7 @@ def show_histogram(df: dd.DataFrame, output_dir="histograms"):
             print(f"Παράλειψη (ήδη υπάρχει): {filename}")
             continue
 
-        print(f"\n▶ Στήλη: {col}")
+        print(f"\nΣτήλη: {col}")
         plt.figure(figsize=(8, 4))
 
         try:
@@ -101,7 +101,7 @@ def show_heatmap(df: dd.DataFrame):
 
     # If there are no numeric columns, we cannot create a heatmap
     if df_numeric.shape[1] < 2:
-        print("✘ Δεν υπάρχουν αρκετές αριθμητικές στήλες για heatmap.")
+        print("Δεν υπάρχουν αρκετές αριθμητικές στήλες για heatmap.")
         return
 
     # Calculate the correlation matrix

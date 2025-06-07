@@ -1,3 +1,8 @@
+# exercise 3
+# up1092678
+# ECE Department - University of Patras
+# Data Mining and Learning Algorithms - Spring Semester 2024-2025
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split

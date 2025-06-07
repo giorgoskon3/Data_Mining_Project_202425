@@ -1,3 +1,8 @@
+# exercise 2
+# up1092678
+# ECE Department - University of Patras
+# Data Mining and Learning Algorithms - Spring Semester 2024-2025
+
 import dask.dataframe as dd
 import pandas as pd
 from sklearn.cluster import KMeans, AgglomerativeClustering
