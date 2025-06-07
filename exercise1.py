@@ -88,48 +88,26 @@ def show_histogram(df: dd.DataFrame, output_dir="histograms"):
         plt.close()
         print(f"Αποθηκεύτηκε: {filename}")
 
-    
-# def show_heatmap(df: dd.DataFrame):
-#     # Υπολογισμός μικρού δείγματος (1%)
-#     df_sample = df.sample(frac=0.01).compute()
-
-#     # Μετατροπή τύπων (π.χ. string[pyarrow] -> object)
-#     df_sample = df_sample.convert_dtypes()
-
-#     # Κράτα μόνο αριθμητικές στήλες
-#     df_numeric = df_sample.select_dtypes(include=["number"]).dropna()
-
-#     if df_numeric.shape[1] < 2:
-#         print("✘ Δεν υπάρχουν αρκετές αριθμητικές στήλες για heatmap.")
-#     else:
-#         corr = df_numeric.corr()
-    
-#     plt.figure(figsize=(10, 8))
-#     sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", square=True, cbar_kws={"shrink": .8})
-#     plt.title("Heatmap of Correlation Matrix")
-#     plt.tight_layout()
-#     plt.show()
-
 def show_heatmap(df: dd.DataFrame):
 
     separator("Heatmap Correlation Matrix")
 
-    # Υπολογισμός δείγματος
+    # Sample the data to speed up processing
     df_sample = df.sample(frac=0.01).compute()
     df_sample = df_sample.convert_dtypes()
 
-    # Κρατάμε μόνο αριθμητικά
+    # Select only numeric columns and drop NaN values
     df_numeric = df_sample.select_dtypes(include=["number"]).dropna()
 
-    # Αν δεν έχει 2+ στήλες, δεν φτιάχνουμε heatmap
+    # If there are no numeric columns, we cannot create a heatmap
     if df_numeric.shape[1] < 2:
         print("✘ Δεν υπάρχουν αρκετές αριθμητικές στήλες για heatmap.")
         return
 
-    # Υπολογισμός πίνακα συσχέτισης
+    # Calculate the correlation matrix
     corr = df_numeric.corr()
 
-    # Φιλτράρουμε τις συσχετίσεις που έχουν τιμή > 0.9 για έξτρα αναφορά (προαιρετικό)
+    # Find strong correlations
     print("\nΙσχυρές συσχετίσεις (|corr| > 0.9):")
     for i in range(len(corr.columns)):
         for j in range(i+1, len(corr.columns)):
@@ -137,7 +115,7 @@ def show_heatmap(df: dd.DataFrame):
             if abs(value) > 0.9:
                 print(f"{corr.columns[i]} <-> {corr.columns[j]}: {value:.2f}")
 
-    # Δημιουργία heatmap με καλύτερη μορφοποίηση
+    # Create the heatmap
     plt.figure(figsize=(18, 14))
     sns.heatmap(
         corr,
