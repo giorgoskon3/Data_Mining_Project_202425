@@ -90,24 +90,49 @@ def create_sample(ddf: pd.DataFrame, frac=0.1, output="sample.csv"):
 def create_kmeans(df: pd.DataFrame, n_clusters=10):
     separator("KMeans Clustering")
     KMEANS_OUTPUT = "kmeans.csv"
+
+    # 1. Αφαίρεση NaN από αριθμητικές στήλες
     df = df.dropna(axis=1)
-    df_numeric = df.select_dtypes(include="number")
+    
+    # 2. Διαχωρισμός των στηλών Label και Traffic Type (αν υπάρχουν)
+    extra_cols = []
+    for col in ['Label', 'Traffic Type']:
+        if col in df.columns:
+            extra_cols.append(col)
+    extra_data = df[extra_cols].copy() if extra_cols else None
+
+    # 3. Επιλογή αριθμητικών δεδομένων
+    df_numeric = df.select_dtypes(include="number").copy()
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(df_numeric)
 
+    # 4. KMeans clustering
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     df_numeric["Cluster"] = kmeans.fit_predict(X_scaled)
 
+    # 5. Εύρεση των πιο αντιπροσωπευτικών σημείων (closest to centroids)
     centroids = []
+    extra_rows = []
     for i in range(n_clusters):
         cluster_i = df_numeric[df_numeric["Cluster"] == i].drop("Cluster", axis=1)
         center = kmeans.cluster_centers_[i]
         closest_idx = ((cluster_i - center) ** 2).sum(axis=1).idxmin()
         centroids.append(cluster_i.loc[closest_idx])
 
+        # Αν υπάρχουν, πάρε τις αντίστοιχες Label/Traffic Type τιμές
+        if extra_data is not None:
+            extra_rows.append(extra_data.iloc[closest_idx])
+
+    # 6. Δημιουργία τελικού dataframe
     kmeans_df = pd.DataFrame(centroids)
+    if extra_rows:
+        extra_df = pd.DataFrame(extra_rows).reset_index(drop=True)
+        kmeans_df = pd.concat([kmeans_df.reset_index(drop=True), extra_df], axis=1)
+
+    # 7. Αποθήκευση
     kmeans_df.to_csv(KMEANS_OUTPUT, index=False)
-    print(f"KMeans saved to {KMEANS_OUTPUT}")
+    print(f"✅ KMeans saved to {KMEANS_OUTPUT} with {len(kmeans_df)} representative points")
+
     return kmeans_df
 
 # Finding the best K using Silhouette Score
@@ -151,30 +176,46 @@ def find_best_k_silhouette(df: pd.DataFrame, k_range=range(2, 15)):
 def run_hdbscan(df, min_cluster_size=50, sample_frac=0.1):
     print("🔍 Running PCA + HDBSCAN...")
 
-    # 1. Κρατάμε μόνο αριθμητικές στήλες και αφαιρούμε στήλες με NaN
-    df_numeric = df.select_dtypes(include="number").dropna(axis=1)
+    # 1. Αφαίρεση στηλών με NaN
+    df = df.dropna(axis=1)
+
+    # 2. Διαχωρισμός των κατηγορικών (Label, Traffic Type)
+    extra_cols = []
+    for col in ['Label', 'Traffic Type']:
+        if col in df.columns:
+            extra_cols.append(col)
+    extra_data = df[extra_cols].copy() if extra_cols else None
+
+    # 3. Επιλογή αριθμητικών δεδομένων
+    df_numeric = df.select_dtypes(include="number")
     print(f"Numeric shape before sampling: {df_numeric.shape}")
 
-    # 2. Δειγματοληψία
+    # 4. Δειγματοληψία
     df_numeric = df_numeric.sample(frac=sample_frac, random_state=42)
+    if extra_data is not None:
+        extra_data = extra_data.loc[df_numeric.index].copy()
     print(f"Sampled shape: {df_numeric.shape}")
 
-    # 3. Κλιμάκωση
+    # 5. Κλιμάκωση
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(df_numeric)
 
-    # 4. PCA για διατήρηση 90% διασποράς
+    # 6. PCA για 90% variance
     pca = PCA(n_components=0.9, svd_solver='full', random_state=42)
     X_pca = pca.fit_transform(X_scaled)
     print(f"PCA shape: {X_pca.shape}")
 
-    # 5. HDBSCAN
+    # 7. HDBSCAN
     clusterer = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, core_dist_n_jobs=1)
     labels = clusterer.fit_predict(X_pca)
 
-    # 6. Προσθήκη αποτελεσμάτων
+    # 8. Προσθήκη αποτελεσμάτων
     df_result = df_numeric.copy()
     df_result["Cluster"] = labels
+
+    if extra_data is not None:
+        df_result = pd.concat([df_result.reset_index(drop=True), extra_data.reset_index(drop=True)], axis=1)
+
     df_result.to_csv("hdbscan_pca_sampled.csv", index=False)
     print("✅ HDBSCAN completed and saved to hdbscan_pca_sampled.csv")
 
@@ -193,7 +234,7 @@ if __name__ == "__main__":
     
     # create_sample(df, frac=0.2)
     # best_k = find_best_k_silhouette(df, k_range=range(150, 155))
-    best_k = 150 # I found that best_k is 11 from previous runs
-    create_kmeans(df, n_clusters=best_k)
-    # run_hdbscan(df)
+    # best_k = 150 # I found that best_k is 11 from previous runs
+    # create_kmeans(df, n_clusters=best_k)
+    run_hdbscan(df)
 
